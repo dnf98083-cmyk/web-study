@@ -1,0 +1,360 @@
+art 실습 — '#'로 X자 그리기
+문제 의도 (교수님 취지 정리)
+•	“그냥 출력”이 아니라 행·열 좌표 사고를 훈련하는 과제예요.
+•	핵심: 행 r, 열 c를 돌면서 “X자에 해당하는 칸인가?”를 조건식으로 판별.
+________________________________________
+1) 반복문 없이 print만으로 구현
+해법 아이디어
+•	아주 작은 크기(예: 5×5)라 가정하고, 행 단위 문자열을 직접 만들어 print만 사용합니다.
+•	패턴을 “눈으로 보고” 하드코딩 → 규칙 관찰의 출발점.
+(참고) 예시
+print("#   #");
+print(" # # ");
+print("  #  ");
+print(" # # ");
+print("#   #");
+관찰 포인트: 0행과 4행은 양 끝, 1·3행은 1칸/3칸, 2행은 중앙 1칸.
+________________________________________
+ 
+2) 반복문+조건문으로 print 구현
+해법 아이디어
+•	크기 n(홀수/짝수 무관)에서,
+o	주대각선 조건: r == c
+o	부대각선 조건: r + c == n - 1
+•	각 행마다 열을 순회하며, 위 조건이면 #, 아니면 공백(또는 .)을 붙여 행 문자열을 만든 뒤 출력.
+// 2. 반복문과 조건문을 이용해서 print 함수로 구현
+void main() {
+  int n = 5;
+
+  for (int r = 0; r < n; r++) {
+    String line = ''; // 한 줄 전체를 담을 문자열
+
+    for (int c = 0; c < n; c++) {
+      if (r == c || r + c == n - 1) {
+        line += '#';
+      } else {
+        line += ' ';
+      }
+    }
+
+    print(line); // 한 줄 전체 출력
+  }
+________________________________________
+3) “정사각형 격자”를 포함한 X자 그리기
+해법 아이디어
+•	격자(보더)까지 포함하면 “칸” 개념이 필요합니다.
+•	경계(테두리) 조건을 추가:
+o	상하 테두리: r == 0 || r == n-1
+o	좌우 테두리: c == 0 || c == n-1
+•	출력 문자를 구분해 가독성 ↑
+o	X자: #
+o	테두리: + (또는 |, -)
+o	내부 빈칸: .
+void main() {
+  drawXWithBorder(7); // n을 5, 7, 9 등으로 바꿔보세요
+}
+
+void drawXWithBorder(int n) {
+  if (n < 2) {
+    print('n은 2 이상이어야 합니다.');
+    return;
+  }
+
+  for (int r = 0; r < n; r++) {
+    final line = StringBuffer();
+    for (int c = 0; c < n; c++) {
+      final bool isBorder = (r == 0 || r == n - 1 || c == 0 || c == n - 1);
+
+      if (isBorder) {
+        // 테두리 문자 세분화 (모서리/가로/세로)
+        final bool isCorner = (r == 0 || r == n - 1) && (c == 0 || c == n - 1);
+        if (isCorner) {
+          line.write('+');
+        } else if (r == 0 || r == n - 1) {
+          line.write('-');
+        } else {
+          line.write('|');
+        }
+      } else if (r == c || r + c == n - 1) {
+        // 내부 X자
+        line.write('#');
+      } else {
+        // 내부 빈칸 (가독성 위해 공백. 필요하면 '.'로 교체)
+        line.write(' ');
+      }
+    }
+    print(line.toString());
+  }
+}
+ 
+// #으로 n 높이 반복 으로 v자출력
+1) n×n 정사각형(모든 칸 #)( 분해요소)
+void main() {
+  drawSquare(5); // 1단계: 5x5 정사각형 출력
+}
+
+void drawSquare(int n) {
+  for (int r = 0; r < n; r++) {
+    final sb = StringBuffer();
+    for (int c = 0; c < n; c++) {
+      sb.write('#');
+    }
+    print(sb.toString());
+  }
+}________________________________________
+ 
+2) “정사각형 바탕”에서 V 모양으로 바꾸기
+핵심: 열 c에 대해, V의 행 위치를 삼각파로 계산하고 그 위치만 #, 나머지는 공백.
+•	한 사이클(내려갔다 올라오기) 주기: period = 2*(n-1)
+•	열 c의 위상 phase = c
+•	그 열에서 #가 있어야 할 행:
+row = (phase <= n-1) ? phase : period – phase
+
+void main() {
+  drawV(5); // 높이 n=5인 V 모양 한 번 출력
+}
+void drawV(int n) {
+  final int period = 2 * (n - 1); // 내려감(n-1) + 올라감(n-1)
+  final int width  = period + 1;  // V 한 개의 가로 길이
+  for (int r = 0; r < n; r++) {
+    final sb = StringBuffer();
+    for (int c = 0; c < width; c++) {
+      final int phase = c;                          // 0..period
+      final int row   = (phase <= n - 1)
+          ? phase                                    // 내려가는 구간
+          : period - phase;                          // 올라가는 구간
+      sb.write(row == r ? '#' : ' ');
+    }
+    print(sb.toString()); // 한 줄 출력 (줄바꿈)
+  }
+}________________________________________
+ 
+3) 그 V 모양을 n번 반복 (또는 원하는 횟수만큼)
+세그먼트(V) 하나를 가로로 repeats번 독립적으로 이어붙입니다.
+각 세그먼트는 항상 맨 위에서 다시 시작(우림님이 말한 vvvv 느낌).
+void drawVChain({required int n, required int repeats, int gap = 0}) {
+  final int period   = 2 * (n - 1);
+  final int segWidth = period + 1;
+
+  for (int r = 0; r < n; r++) {
+    final sb = StringBuffer();
+
+    for (int seg = 0; seg < repeats; seg++) {
+      for (int c = 0; c < segWidth; c++) {
+        final int phase = c; // 세그먼트마다 0부터 다시 시작
+        final int row   = (phase <= n - 1) ? phase : period - phase;
+        sb.write(row == r ? '#' : ' ');
+      }
+      // 세그먼트 사이 공백
+      for (int g = 0; g < gap; g++) sb.write(' ');
+    }
+
+    print(sb.toString());
+  }
+}
+ 
+⚙️ 1️⃣ 반복 방식의 근본 차이
+구분	네 방식 (drawVRightRepeat)	교수님 방식 (printV)
+V 반복 원리	for (seg = 0; seg < repeats)로 세그먼트별로 반복	x % width로 자동 주기성(mod 연산) 이용
+좌표 계산 방식	각 세그먼트를 독립된 좌표계로 새로 시작 (0~period)	전체 x축 위에서 패턴이 주기적으로 반복됨
+반복 제어 위치	바깥쪽 반복문에서 직접 제어	내부 수식(x % width)에서 자동 제어
+간격 (gap)	세그먼트 간 간격을 gap 변수로 직접 제어	간격은 없음 (원하면 width를 늘려야 함)
+👉 요약하자면:
+•	너의 코드는 “V를 여러 번 복사해서 옆으로 붙이는 구조”
+•	교수님 코드는 “하나의 패턴을 반복적으로 그리게 하는 수학적 함수형 구조”
+________________________________________
+🧩 2️⃣ 구조 비교 (for문 단계별)
+네 코드
+for (행 r)
+  for (세그먼트 seg)
+    for (세그먼트 내부 칸 c)
+→ “V 하나 그리기”를 n번 반복
+→ 완전히 분리된 작은 V들이 이어짐
+교수님 코드
+for (행 y)
+  for (전체 가로 x)
+    if (x % width == y || width - 1 - (x % width) == y)
+→ “전체 x 좌표” 하나만 돌리면서
+→ x % width 로 현재 좌표가 어느 V의 어느 부분인지 계산
+________________________________________
+🧠 3️⃣ 계산 사고 차이
+항목	네 방식	교수님 방식
+패턴 처리	반복 단위별로 새로 시작	수학적 주기(mod)로 자동 반복
+좌표 공간	각 V마다 지역(local) 좌표	하나의 전역(global) 좌표
+가독성	명확하고 직관적 (초보자에게 쉬움)	수식이 조금 추상적이지만 우아함
+유연성	gap 조절, 독립제어 용이	반복 주기 변경만 가능 (gap 추가 어려움)
+효율성	반복문이 많아 약간 느림 (하지만 n 작으면 무시됨)	반복문 단 하나, 계산식만으로 반복 (효율적)
+________________________________________
+📊 4️⃣ 예시 비교
+예를 들어 height = 5, repeats = 3, gap = 2면:
+너의 출력
+#       #  #       #  #       #
+ #     #    #     #    #     #
+  #   #      #   #      #   #
+   # #        # #        # #
+    #          #          #
+→ gap을 직접 제어 가능, 독립된 V 3개.
+교수님 출력
+#       #       #       #
+ #     # #     # #     #
+  #   #   #   #   #   #
+   # #     # #     # #
+    #       #       #
+→ gap 고정, 패턴이 수학적으로 반복됨.
+________________________________________
+🔍 결론 요약
+요약 포인트	설명
+네 방식	구조적으로 명확하고, 각 V를 개별 제어 가능 (gap 등 커스터마이징 강함)
+교수님 방식	수학적 접근으로 하나의 패턴을 깔끔하게 반복 (코드 간결, 효율적)
+결론적으로	네 코드는 “프로그래밍적으로 반복”, 교수님 코드는 “함수적으로 반복”하는 구조야.
+ 
+________________________________________
+Flutter 실습 — Container, Center, Column, Row, Expanded
+오타 주의: Expanded 가 맞습니다. (과제엔 “Expended”로 적혀있는데 실제 위젯명은 Expanded)
+실습 전 핵심 개념(제약 이해)
+•	Container(width:100, height:100)로 부모 크기 고정.
+•	Expanded는 남은 공간을 분할할 뿐, 정사각형 보장 X.
+→ “정사각형”을 원하면 AspectRatio(aspectRatio: 1) 또는 **SizedBox.square**로 보정.
+•	Center는 자식의 정렬(중앙 배치) 담당.
+________________________________________
+ 
+1) 100×100 파란색 Container
+해법 아이디어
+•	뿌리엔 Center로 화면 중앙 배치 → 그 안에 100×100 Container.
+(참고) 예시 코드
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Container(
+            width: 100, height: 100,
+            color: Colors.blue,
+          ),
+        ),
+      ),
+    );
+  }
+}
+________________________________________
+2) “이등분” + 작은 빨강/노랑 정사각형 2개 (Expanded 활용)
+해법 아이디어(정사각형 유지 요령)
+•	100×100을 좌/우 2분할(Row+Expanded) 하면 각 영역은 50×100 직사각형.
+•	이 영역 안에 AspectRatio(1) 또는 SizedBox.square(size: 50)로 정사각형을 중앙 배치하세요.
+(참고) 예시 패턴
+Center(
+  child: Container(
+    width: 100, height: 100, color: Colors.blue,
+    child: Row(
+      children: [
+        Expanded(
+          child: Center(
+            child: SizedBox.square(
+              dimension: 50,
+              child: Container(color: Colors.red),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Center(
+            child: SizedBox.square(
+              dimension: 50,
+              child: Container(color: Colors.yellow),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+포인트: Expanded = 영역 분할, Center+SizedBox.square = 정사각형 유지.
+________________________________________
+3) 함수로 분리 → Column/Row로 여러 개 출력
+해법 아이디어
+•	(2)의 “두 정사각형 행”을 함수로 추출하고, Column/Row로 반복 배치.
+(참고) 예시
+Widget twoSquaresRow({double boxSize = 50}) {
+  return Row(
+    children: [
+      Expanded(child: Center(child: SizedBox.square(dimension: boxSize, child: Container(color: Colors.red)))),
+      Expanded(child: Center(child: SizedBox.square(dimension: boxSize, child: Container(color: Colors.yellow)))),
+    ],
+  );
+}
+
+class Demo3 extends StatelessWidget {
+  const Demo3({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 100, height: 100, color: Colors.blue,
+        child: Column(
+          children: [
+            Expanded(child: twoSquaresRow(boxSize: 40)),
+            Expanded(child: twoSquaresRow(boxSize: 40)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+팁: boxSize를 바꿔보고, 부모 100×100 제약을 넘지 않게 조절해보세요.
+________________________________________
+4) StatelessWidget으로 분리 → 재사용
+해법 아이디어
+•	(3)의 함수 로직을 독립 위젯으로 만들어 속성(색상, 크기)만 바꿔 재사용.
+(참고) 예시
+class TwoSquares extends StatelessWidget {
+  final double size; // 각 작은 정사각형 한 변 길이
+  final Color leftColor;
+  final Color rightColor;
+  const TwoSquares({
+    super.key,
+    this.size = 50,
+    this.leftColor = Colors.red,
+    this.rightColor = Colors.yellow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(child: Center(child: SizedBox.square(dimension: size, child: Container(color: leftColor)))),
+        Expanded(child: Center(child: SizedBox.square(dimension: size, child: Container(color: rightColor)))),
+      ],
+    );
+  }
+}
+
+class Demo4 extends StatelessWidget {
+  const Demo4({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 100, height: 100, color: Colors.blue,
+        child: Column(
+          children: const [
+            Expanded(child: TwoSquares(size: 40, leftColor: Colors.red, rightColor: Colors.yellow)),
+            Expanded(child: TwoSquares(size: 40, leftColor: Colors.green, rightColor: Colors.orange)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+________________________________________
+빠른 셀프 체크리스트 (실습 중 과제 확인 대비)
+•	Dart: 대각선 조건 r==c, r+c==n-1을 말로 설명할 수 있다.
+•	Dart: 테두리/내부/X자 우선순위를 정해 충돌 없이 출력한다.
+•	Flutter: 100×100 부모 제약을 이해하고, **Expanded는 “분할”**일 뿐 정사각형을 보장하지 않음을 설명할 수 있다.
+•	Flutter: 정사각형 유지에 SizedBox.square 또는 AspectRatio(1)를 왜/언제 쓰는지 설명할 수 있다.
+•	Flutter: 함수 → StatelessWidget으로 리팩터링해 재사용성을 높였다.
+
