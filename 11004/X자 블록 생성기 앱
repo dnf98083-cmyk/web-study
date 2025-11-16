@@ -1,0 +1,176 @@
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+// 애플리케이션의 시작점입니다.
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'X자 블록 생성기',
+      // 개발 중 시각적 노이즈를 제거하는 설정들
+      debugShowCheckedModeBanner: false,
+      showPerformanceOverlay: false,
+      debugShowMaterialGrid: false,
+      checkerboardOffscreenLayers: false,
+      checkerboardRasterCacheImages: false,
+      // 스크롤바를 제거하는 설정
+      builder: (context, child) => ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: child!,
+      ),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        scaffoldBackgroundColor: const Color(0xFFF5F3F7), // 은은한 배경
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+          isDense: true,
+        ),
+      ),
+      home: const XGridPage(),
+    );
+  }
+}
+
+// 사용자로부터 N을 입력받고 X자 격자를 표시하는 페이지
+class XGridPage extends StatefulWidget {
+  const XGridPage({super.key});
+  @override
+  State<XGridPage> createState() => _XGridPageState();
+}
+
+class _XGridPageState extends State<XGridPage> {
+  // 텍스트 필드 컨트롤러 (초기값 '10')
+  final TextEditingController _nCtrl = TextEditingController(text: '10');
+  // 현재 격자 크기 N 값
+  int _n = 10;
+  // 각 블럭(셀)의 고정된 크기
+  static const double cellSize = 64.0;
+
+  // N 값을 적용하는 함수
+  void _applyN() {
+    final raw = _nCtrl.text.trim();
+    final n = int.tryParse(raw);
+    
+    // 유효성 검사: 자연수(1 이상)가 아니면 스낵바 표시
+    if (n == null || n <= 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('자연수 n(1 이상)을 입력하세요.')));
+      return;
+    }
+    // 상태 업데이트 및 화면 재구성
+    setState(() => _n = n);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('X자 블록 생성기')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // N 입력 필드와 생성 버튼이 포함된 Row
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _nCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: '격자 크기 n (가로/세로)',
+                      hintText: '예) 10',
+                    ),
+                    onSubmitted: (_) => _applyN(),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // 생성 버튼
+                FilledButton(
+                  onPressed: _applyN,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    child: Text('생성'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            // X자 격자 출력 영역 (카드 스타일, 스크롤 가능)
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView( // 가로 스크롤 허용
+                  scrollDirection: Axis.horizontal,
+                  child: SingleChildScrollView( // 세로 스크롤 허용
+                    scrollDirection: Axis.vertical,
+                    child: Card( // 카드 배경 및 그림자 효과
+                      elevation: 3,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ClipRRect( // 경계를 둥글게 자름
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          // N x N 격자를 생성하는 Column (행)
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // N개의 Row (행) 생성
+                              for (int r = 0; r < _n; r++)
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // 각 Row 안에 N개의 Cell (열) 생성
+                                    for (int c = 0; c < _n; c++)
+                                      _buildCell(r, c, _n),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// (r, c) 위치의 셀을 생성합니다.
+  /// 
+  /// - `r`: 현재 행 인덱스 (0부터 N-1)
+  /// - `c`: 현재 열 인덱스 (0부터 N-1)
+  /// - `n`: 격자의 총 크기
+  Widget _buildCell(int r, int c, int n) {
+    // X자 패턴 결정 로직:
+    // 1. 주 대각선: r == c (행 인덱스 == 열 인덱스)
+    // 2. 역 대각선: r + c == n - 1 (행 인덱스 + 열 인덱스 == N-1)
+    final bool isX = (r == c) || (r + c == n - 1);
+    
+    return Container(
+      width: cellSize,
+      height: cellSize,
+      decoration: BoxDecoration(
+        // X자 패턴일 경우 파란색, 아니면 투명색
+        color: isX ? const Color(0xFF2196F3) : Colors.transparent, // 파란 X
+        // 모든 셀에 얇은 회색 격자선을 표시
+        border: Border.all(
+          color: const Color(0xFFE0E0E0), // 얇은 회색 격자선
+          width: 1,
+        ),
+      ),
+    );
+  }
+}
