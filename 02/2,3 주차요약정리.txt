@@ -1,0 +1,60 @@
+1) Flutter & 개발환경 (핵심만)
+
+플러터 특징: 하나의 코드베이스로 iOS/Android/Web/데스크톱 동시 개발. Skia 엔진 + C/C++로 직접 컴파일 → JS 브릿지 없이 네이티브에 준하는 성능. 핫 리로드로 UI 수정 즉시 확인 가능
+
+2주차_플러터 소개,개발환경 설정하기 (2)
+
+장점: 속도(핫 리로드), 완성도 높은 위젯, 일관된 디자인, 디버깅 용이, 구글/커뮤니티 지원
+
+2주차_플러터 소개,개발환경 설정하기 (2)
+
+단점: 잦은 업데이트로 지속 학습 필요, 다트 학습 필요, 들여쓰기 깊어지기 쉬움, 채용은 성장 중
+
+2주차_플러터 소개,개발환경 설정하기 (2)
+
+환경 구축 순서:
+
+Git 설치(Flutter 채널/버전관리용) → 2) Flutter SDK 설치 & PATH 등록 → 3) Android Studio(플랫폼/SDK) → 4) VS Code + 확장(Flutter, Dart, Error Lens 등) → 5) flutter doctor로 점검
+
+2주차_플러터 소개,개발환경 설정하기 (2)
+
+VS Code 추천 확장/단축키: Flutter/Dart, Error Lens, Material Icon Theme, Snippets 등. 단축키는 명령 팔레트(Win: Ctrl+Shift+P) 등 기본 운영
+
+2주차_플러터 소개,개발환경 설정하기 (2)
+
+과제 방식: 매일 TIL을 커밋/푸시해서 잔디 심기 (주 3~4개 권장)
+
+2주차_플러터 소개,개발환경 설정하기 (2)
+
+2) Dart 기초 (핵심만)
+
+배경: JS 대체 목적으로 출발 → 2017 Flutter 전환점 이후 급성장, 구글 적극 지원
+
+3주차. 다트 이해하기 (1)
+
+연습 환경: 브라우저 기반 DartPad(https://dartpad.dev
+) 
+
+3주차. 다트 이해하기 (1)
+
+타입 & Null Safety: String vs String?, ?.(null-safe access), ??(null 병합)
+
+3주차. 다트 이해하기 (1)
+
+주요 타입/컬렉션: int, double, String, List, Set, Map (가변/고정 리스트, 중복불가 Set, 키-값 Map)
+
+3주차. 다트 이해하기 (1)
+
+연산자/제어문: 산술/비교/삼항, if/else, for/for-in/while, Dart 3의 switch 패턴 매칭
+
+3주차. 다트 이해하기 (1)
+
+함수/매개변수: 위치/이름 지정(required, int?), 표현식 바디 가능
+
+3주차. 다트 이해하기 (1)
+
+객체지향: class, 생성자, extends, @override
+
+3주차. 다트 이해하기 (1)
+
+Dart 3.x: Records((name, age)), 패턴 매칭(리스트/구조 분해

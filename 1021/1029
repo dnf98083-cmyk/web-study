@@ -1,0 +1,185 @@
+Widget createBody() {
+  //return Center(child: createS1());
+  return Column(
+    children: [
+      createS2(MainAxisAlignment.start),
+      createS2(MainAxisAlignment.center),
+      createS2(MainAxisAlignment.end),
+      createS2(MainAxisAlignment.spaceEvenly),
+      createS2(MainAxisAlignment.spaceBetween),
+      createS2(MainAxisAlignment.spaceAround),
+    ],
+  );
+}
+
+Widget createS2(MainAxisAlignment mainAxisAlignment) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: List.generate(
+      5,
+      (index) => Container(
+        width: 40,
+        height: 40,
+        color: Colors.red,
+        margin: const EdgeInsets.all(5),
+      ),
+    ),
+  );
+}
+
+ 
+Widget createBody() {
+  //return Center(child: createS1());
+  return Column(
+    children: [
+      createS3(CrossAxisAlignment.stretch),
+      createS3(CrossAxisAlignment.start),
+      createS3(CrossAxisAlignment.end),
+      createS3(CrossAxisAlignment.center),
+    ],
+  );
+}
+
+Widget createS3(CrossAxisAlignment crossAxisAlignment) {
+  return Container(
+    height: 100,
+    color: Colors.blue,
+    child: Row(
+      crossAxisAlignment: crossAxisAlignment,
+      children: List.generate(
+        5,
+        (index) => Container(
+          width: 40,
+          height: 40,
+          color: Colors.red,
+          margin: const EdgeInsets.all(5),
+        ),
+      ),
+    ),
+  );
+}
+ 
+168~169
+return Row(
+    children: [
+      createS4(MainAxisAlignment.start),
+      createS4(MainAxisAlignment.center),
+      createS4(MainAxisAlignment.end),
+      createS4(MainAxisAlignment.spaceAround),
+      createS4(MainAxisAlignment.spaceBetween),
+      createS4(MainAxisAlignment.spaceEvenly),
+      //
+      createS5(CrossAxisAlignment.start),
+      createS5(CrossAxisAlignment.center),
+      createS5(CrossAxisAlignment.end),
+    ],
+  ); //컬럼블럭에서는 row 사용
+}
+
+Widget createS5(CrossAxisAlignment crossAxisAlignment) {
+  return Container(
+    width: 100,
+    color: Colors.blue,
+    margin: const EdgeInsets.all(5),
+    child: Column(
+      crossAxisAlignment: crossAxisAlignment,
+      children: List.generate(
+        5,
+        (index) => Container(
+          width: 40,
+          height: 40,
+          color: Colors.red,
+          margin: const EdgeInsets.all(5),
+        ), // Container
+      ), // List.generate
+    ), // Column
+  ); // Container
+}
+
+Widget createS4(MainAxisAlignment mainAxisAlignment) {
+  return Column(
+    mainAxisAlignment: mainAxisAlignment,
+    children: List.generate(
+      5,
+      (index) => Container(
+        width: 40,
+        height: 40,
+        color: Colors.red,
+        margin: const EdgeInsets.all(5),
+      ), // Container
+    ), // List.generate
+  ); // Column
+}
+
+ 
+170페이지
+  return createS6();
+}
+
+Widget createS6() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      Expanded(
+        child: Container(
+          height: 40,
+          color: Colors.red,
+          margin: const EdgeInsets.all(5),
+        ), // Container
+      ), // Expanded
+      ...List.generate(
+        4,
+        (index) => Container(
+          width: 40,
+          height: 40,
+          color: Colors.red,
+          margin: const EdgeInsets.all(5),
+        ), // Container
+      ), // List.generate
+    ],
+  ); // Row
+}
+ 
+Widget createS7() {
+  return Column(
+    children: [
+      Row(children: [createBox(1), createBox(1), createBox(1)]),
+      Row(children: [createBox(1), createBox(2), createBox(1)]),
+      Row(children: [createBox(1), createBox(3), createBox(1)]),
+    ],
+  );
+}
+
+Widget createBox(int flex) {
+  return Expanded(
+    flex: flex,
+    child: Container(
+      height: 40,
+      color: Colors.red,
+      margin: const EdgeInsets.all(5),
+    ), // Container
+  ); // Expanded
+}
+ 
+Widget createS8() {
+  return Center(
+    child: SizedBox(
+      width: 350,
+      height: 350,
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: Container(color: Colors.red)),
+                Expanded(child: Container(color: Colors.yellow)),
+              ],
+            ),
+          ),
+          Expanded(child: Container(color: Colors.blue)),
+        ],
+      ),
+    ),
+  );
+}
+
